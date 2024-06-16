@@ -1,0 +1,186 @@
+[
+    {
+        "id": "553575784c786cbf",
+        "type": "tab",
+        "label": "Disable daytime charge",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "51836355028850a6",
+        "type": "victron-input-battery",
+        "z": "553575784c786cbf",
+        "service": "com.victronenergy.battery/512",
+        "path": "/Soc",
+        "serviceObj": {
+            "service": "com.victronenergy.battery/512",
+            "name": "Pylontech battery"
+        },
+        "pathObj": {
+            "path": "/Soc",
+            "type": "float",
+            "name": "State of charge (%)"
+        },
+        "name": "SoC",
+        "onlyChanges": true,
+        "roundValues": "0",
+        "x": 70,
+        "y": 80,
+        "wires": [
+            [
+                "aa8f3e6638a43e80"
+            ]
+        ]
+    },
+    {
+        "id": "954e188a9fe156ca",
+        "type": "switch",
+        "z": "553575784c786cbf",
+        "name": "isMoreThan60",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "60",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 420,
+        "y": 60,
+        "wires": [
+            [
+                "2abd93d3ef1c222a"
+            ],
+            [
+                "92d78c949979f6c1"
+            ]
+        ]
+    },
+    {
+        "id": "aa8f3e6638a43e80",
+        "type": "function",
+        "z": "553575784c786cbf",
+        "name": "is 07..23 hrs ?",
+        "func": "// get current hours\nconst hr = new Date().getHours();\n\n// trigger a message if the time is between 07 and 23 hour\nif (hr >= 7 && hr < 23) {\n    return [msg, null]; // input 1\n} else {\n    return [null, msg]; // input 2\n}\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 80,
+        "wires": [
+            [
+                "954e188a9fe156ca"
+            ],
+            [
+                "92d78c949979f6c1"
+            ]
+        ]
+    },
+    {
+        "id": "2abd93d3ef1c222a",
+        "type": "change",
+        "z": "553575784c786cbf",
+        "name": "Set max charge current to 0",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 60,
+        "wires": [
+            [
+                "c373631865740723"
+            ]
+        ]
+    },
+    {
+        "id": "92d78c949979f6c1",
+        "type": "change",
+        "z": "553575784c786cbf",
+        "name": "Set max charge current to 40",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "40",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 100,
+        "wires": [
+            [
+                "c373631865740723"
+            ]
+        ]
+    },
+    {
+        "id": "c373631865740723",
+        "type": "rbe",
+        "z": "553575784c786cbf",
+        "name": "Filter changes",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 900,
+        "y": 80,
+        "wires": [
+            [
+                "f48cbb1c12f8e332"
+            ]
+        ]
+    },
+    {
+        "id": "f48cbb1c12f8e332",
+        "type": "victron-output-settings",
+        "z": "553575784c786cbf",
+        "service": "com.victronenergy.settings",
+        "path": "/Settings/SystemSetup/MaxChargeCurrent",
+        "serviceObj": {
+            "service": "com.victronenergy.settings",
+            "name": "Venus settings"
+        },
+        "pathObj": {
+            "path": "/Settings/SystemSetup/MaxChargeCurrent",
+            "type": "float",
+            "name": "DVCC system max charge current (A DC)",
+            "writable": true
+        },
+        "name": "",
+        "onlyChanges": false,
+        "x": 1210,
+        "y": 80,
+        "wires": []
+    }
+]
